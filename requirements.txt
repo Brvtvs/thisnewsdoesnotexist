@@ -1,0 +1,8 @@
+Click
+Flask
+Jinja2
+MarkupSafe
+Werkzeug
+itsdangerous
+feedparser
+requests
