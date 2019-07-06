@@ -3,90 +3,170 @@ Takes a feed of real news headlines as a seed to generate fake headlines and the
 headlines.
 """
 
+import hashlib
 import json
-import os
+import re
+from datetime import datetime, date
+from multiprocessing import Process
+from time import mktime
+from time import sleep
 
 import feedparser
-import spacy
-from flask import Flask
+from flask import Flask, abort, request
 
 import grover
+import storage
+
+# to throttle the generation, only generates a fake article from about 1 out of every X articles in the feed
+# todo may want to make sure that we get coverage of different topics, rather than picking them essentially at random
+gen_1_for_each_x_articles = 11
+
+# amount of time to wait in between scraping the rss feed(s)
+seconds_between_generation = 1200
+
+rss_feeds = {
+    'top-news': 'http://feeds.reuters.com/reuters/topNews',
+    # 'world': 'http://feeds.reuters.com/Reuters/worldNews',
+    # 'business': 'http://feeds.reuters.com/reuters/businessNews',
+    # 'technology': 'http://feeds.reuters.com/reuters/technologyNews',
+    # 'politics': 'http://feeds.reuters.com/Reuters/PoliticsNews',
+    # 'health': 'http://feeds.reuters.com/reuters/healthNews',
+    # 'entertainment': 'http://feeds.reuters.com/reuters/entertainment',
+    # 'sports': 'http://feeds.reuters.com/reuters/sportsNews',
+}
+
+max_articles_returned = 50
+
+
+def generate_articles():
+    """Generates fake news articles, using a feed of real ones as seed data."""
+    print('Generating new articles based on scraped articles from %i feeds...' % len(rss_feeds))
+
+    real_articles_by_title = dict()
+    feeds_by_title = dict()
+    dates_seen = set()
+
+    # collects metadata for articles from each rss feed
+    for feed_name, url in rss_feeds.items():
+        feed = feedparser.parse(url)
+
+        # filters out articles based on a deterministic hash of their name to throttle how much generation we're doing
+        filtered_real_articles = [a for a in feed['entries'] if
+                                  int.from_bytes(hashlib.md5(a['title'].encode('utf-8')).digest(),
+                                                 byteorder='big') % gen_1_for_each_x_articles == 0]
+
+        for a in filtered_real_articles:
+            # adds article to list of those that need processing if it isnt already in the list
+            if a['title'] not in real_articles_by_title:
+                real_articles_by_title[a['title']] = a
+
+            # tracks which feeds each title was found in
+            if a['title'] in feeds_by_title:
+                feeds_by_title[a['title']].append(feed_name)
+            else:
+                feeds_by_title[a['title']] = [feed_name]
+
+            # tracks which dates have been seen so we know what local storage to load
+            dates_seen.add(date.fromtimestamp(mktime(a.published_parsed)))
+
+    # loads any saved results for articles we already generated fake articles from so we do not overwhelm the API with requests
+    cached_articles = storage.get_articles_by_date(dates_seen)
+    cached_titles = set(map(lambda a: a["original_title"], cached_articles))
+
+    print('Real titles (', len(real_articles_by_title), '):', real_articles_by_title.keys())
+    print()
+
+    # only need to generate results for those we have not already generated results for
+    uncached_articles = [a for a in real_articles_by_title.values() if a['title'] not in cached_titles]
+
+    # generates titles based on the seeds, then generates article bodies for those titles
+    print('Generating %i new articles...' % len(uncached_articles))
+    generated_articles = []
+    for article in uncached_articles:
+        # Removes all non-word characters (everything except numbers and letters)
+        id = re.sub(r"[^\w\s]", '', article['title'].lower())
+        # Replaces all runs of whitespace with a single dash
+        id = re.sub(r"\s+", '-', id)
+
+        # todo is there a better way to seed the generator than this?
+        generated_title = grover.generate_article_title(article['title'])
+        generated_body = grover.generate_article_body(generated_title)
+
+        generated_articles.append({
+            'id': id,
+            'original_title': article['title'],
+            'published': datetime.fromtimestamp(mktime(article.published_parsed)),
+            'generated_title': generated_title,
+            'generated_body': generated_body,
+            'feeds': feeds_by_title[article['title']]
+        })
+
+    print('Done generating %i new articles' % len(generated_articles))
+
+    # saves generated articles so they can be reused later
+    storage.put_articles(generated_articles)
+
+
+def generate_articles_task():
+    while True:
+        generate_articles()
+        sleep(seconds_between_generation)
+
+
+def get_recent_articles():
+    return storage.get_recent_articles(max_articles_returned)
+
 
 app = Flask(__name__)
-nlp = spacy.load("en_core_web_sm")
 
-# limits number of articles taken from rss feed so this doesnt hit API more than necessary
-# For example, if 3, this will generate fake articles based on the 3 most recent headlines from the feed.
-max_articles = 6
-cache_file = 'cache.json'
-
-# gets a feed of the day's real news articles
-rss = "http://feeds.reuters.com/reuters/topNews"
-feed = feedparser.parse(rss)
-use_these_original_titles = list(map(lambda entry: entry['title'], feed['entries']))
-use_these_original_titles = use_these_original_titles[:max_articles]
-print('Real titles (', len(use_these_original_titles), '):', use_these_original_titles)
-print()
-
-# loads any saved results for articles we already generated fake articles from so we do not overwhelm the API with requests
-if os.path.exists(cache_file):
-    with open('cache.json', 'rt') as json_file:
-        cache = json.load(json_file)
-else:
-    cache = {}
-
-if 'articles' in cache:
-    articles = cache["articles"]
-else:
-    articles = []
-cached_titles = set(map(lambda a: a["original_title"], articles))
-
-uncached_titles = filter(lambda t: t not in cached_titles, use_these_original_titles)
-
-# just uses the real title as is as the prompt for generating the fake title
-# TODO is there a better way to generate seed text than this?
-generate_articles = []
-for title in uncached_titles:
-    seed = title
-    generate_articles.append({'original_title': title, 'seed_title': seed})
-
-# generates titles based on the seeds, then generates article bodies for those titles
-print('Generating %i new articles...' % len(generate_articles))
-for article in generate_articles:
-    article['title'] = grover.generate_article_title(article['seed_title'])
-    article['article'] = grover.generate_article_body(article['title'])
-print('Done generating %i new articles' % len(generate_articles))
-
-# saves generated articles so they can be reused later
-for article in generate_articles:
-    articles.append(article)
-
-cache["articles"] = articles
-with open(cache_file, 'wt') as json_file:
-    json.dump(cache, json_file)
-
-# the articles to actually display in the results
-display_articles = [article for article in articles if article['original_title'] in use_these_original_titles]
-
-
-# TODO try generating authors?
-# TODO replace with better persistence mechanism (ex: SQL database)
 
 @app.route('/')
 def top_news():
+    # todo serve real react frontend
+    articles = storage.get_recent_articles(max_articles_returned, 'top-news')
+
     body = ''
     i = 1
-    for article in display_articles:
+    for article in articles:
         body += '<b>Article ' + str(i) + '.</b><br><br>'
         body += '<b>Original headline: </b>' + article['original_title'] + '<br><br>'
-        body += '<b>Seed headline: </b>' + article['seed_title'] + '<br><br>'
-        body += '<b>Generated headline: </b>' + article['title'] + '<br><br>'
-        body += '<b>Generated body: </b>' + article['article'].replace('\n', '<br><br>') + '<br><br><br><br>'
+        body += '<b>Published: </b>' + article['published'] + '<br><br>'
+        body += '<b>Generated headline: </b>' + article['generated_title'] + '<br><br>'
+        body += '<b>Generated body: </b>' + article['generated_body'].replace('\n', '<br><br>') + '<br><br><br><br>'
 
         i += 1
 
     return body
 
 
+@app.route('/api/v1/articles')
+def get_articles():
+    # todo handle io errors because we have no actual concurrency control
+
+    feed = request.args.get('feed')
+    quantity = request.args.get('quantity')
+    if not feed or not quantity:
+        abort(400, "Missing parameters.")
+    max_results = min(int(quantity), max_articles_returned)
+
+    if feed not in rss_feeds:
+        abort(400, 'Unrecognized feed.')
+
+    return json.dumps(
+        {'articles': storage.get_recent_articles(max_results, feed)},
+        sort_keys=True, default=str)
+
+
+@app.route('/api/v1/article/<date>/<id>')
+def get_article(date: str, id: str):
+    article = storage.get_article(date, id)
+    if not article:
+        abort(404, 'Article not found.')
+    return json.dumps(article, sort_keys=True, default=str)
+
+
 if __name__ == '__main__':
+    background_process = Process(target=generate_articles_task)
+    background_process.start()
+
     app.run()
