@@ -83,23 +83,26 @@ def generate_articles():
     print('Generating %i new articles...' % len(uncached_articles))
     generated_articles = []
     for article in uncached_articles:
-        # Removes all non-word characters (everything except numbers and letters)
-        id = re.sub(r"[^\w\s]", '', article['title'].lower())
-        # Replaces all runs of whitespace with a single dash
-        id = re.sub(r"\s+", '-', id)
+        try:
+            # Removes all non-word characters (everything except numbers and letters)
+            id = re.sub(r"[^\w\s]", '', article['title'].lower())
+            # Replaces all runs of whitespace with a single dash
+            id = re.sub(r"\s+", '-', id)
 
-        # todo is there a better way to seed the generator than this?
-        generated_title = grover.generate_article_title(article['title'])
-        generated_body = grover.generate_article_body(generated_title)
+            # todo is there a better way to seed the generator than this?
+            generated_title = grover.generate_article_title(article['title'])
+            generated_body = grover.generate_article_body(generated_title)
 
-        generated_articles.append({
-            'id': id,
-            'original_title': article['title'],
-            'published': datetime.fromtimestamp(mktime(article.published_parsed)),
-            'generated_title': generated_title,
-            'generated_body': generated_body,
-            'feeds': feeds_by_title[article['title']]
-        })
+            generated_articles.append({
+                'id': id,
+                'original_title': article['title'],
+                'published': datetime.fromtimestamp(mktime(article.published_parsed)),
+                'generated_title': generated_title,
+                'generated_body': generated_body,
+                'feeds': feeds_by_title[article['title']]
+            })
+        except Exception:
+            print('Failed to generate an article from %s. Ignoring it for now...' % article['title'])
 
     print('Done generating %i new articles' % len(generated_articles))
 
@@ -109,7 +112,10 @@ def generate_articles():
 
 def generate_articles_task():
     while True:
-        generate_articles()
+        try:
+            generate_articles()
+        except Exception:
+            print('Encountered an error generating articles. Will try again later...')
         sleep(seconds_between_generation)
 
 
