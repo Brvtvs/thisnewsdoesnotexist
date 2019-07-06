@@ -19,20 +19,20 @@ import storage
 
 # to throttle the generation, only generates a fake article from about 1 out of every X articles in the feed
 # todo may want to make sure that we get coverage of different topics, rather than picking them essentially at random
-gen_1_for_each_x_articles = 11
+gen_1_for_each_x_articles = 5
 
 # amount of time to wait in between scraping the rss feed(s)
 seconds_between_generation = 1200
 
 rss_feeds = {
     'top-news': 'http://feeds.reuters.com/reuters/topNews',
-    # 'world': 'http://feeds.reuters.com/Reuters/worldNews',
-    # 'business': 'http://feeds.reuters.com/reuters/businessNews',
-    # 'technology': 'http://feeds.reuters.com/reuters/technologyNews',
-    # 'politics': 'http://feeds.reuters.com/Reuters/PoliticsNews',
-    # 'health': 'http://feeds.reuters.com/reuters/healthNews',
-    # 'entertainment': 'http://feeds.reuters.com/reuters/entertainment',
-    # 'sports': 'http://feeds.reuters.com/reuters/sportsNews',
+    'world': 'http://feeds.reuters.com/Reuters/worldNews',
+    'business': 'http://feeds.reuters.com/reuters/businessNews',
+    'technology': 'http://feeds.reuters.com/reuters/technologyNews',
+    'politics': 'http://feeds.reuters.com/Reuters/PoliticsNews',
+    'health': 'http://feeds.reuters.com/reuters/healthNews',
+    'entertainment': 'http://feeds.reuters.com/reuters/entertainment',
+    'sports': 'http://feeds.reuters.com/reuters/sportsNews',
 }
 
 max_articles_returned = 50
