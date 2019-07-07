@@ -36,7 +36,7 @@ def get_articles_by_date(dates):
     return articles
 
 
-def get_recent_articles(max_articles: int, feed: str):
+def get_recent_articles(max_articles: int, feed):
     storage_files = []
 
     # loads enough files in reverse order to get at least max number of articles
@@ -52,7 +52,7 @@ def get_recent_articles(max_articles: int, feed: str):
         file = storage_files[i]
         with open(storage_folder + file, 'rt') as json_file:
             stored = json.load(json_file)
-            articles += [a for a in stored['articles'] if feed in a['feeds']]
+            articles += [a for a in stored['articles'] if feed is None or feed in a['feeds']]
         i += 1
 
     # takes the newest articles up to the max
