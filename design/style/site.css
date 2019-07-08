@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Old+Standard+TT&display=swap');
 @import url('https://fonts.googleapis.com/css?family=GFS+Didot');
 
+@font-face {
+    font-family: JostBold;
+    src: url("../fonts/Jost-700-Bold.ttf");
+}
+
 html {
     font-family: 'Old Standard TT', serif;
 }
@@ -171,15 +176,53 @@ html {
 
 #footer {
     background-color: #333333;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    padding-top: 45px;
+    padding-bottom: 45px;
+    color: #cbcbcb;
+    font-family: "Jost";
 }
 
 #footer-content {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
-    text-align: center;
-    font-family: 'Jost';
+    display: flex;
+    flex-direction: row;
+}
+
+.footer-col {
+    width: 25%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.footer-col-title {
+    font-size: 1.2em;
+    font-family: JostBold;
     color: #A3A3A3;
+}
+
+.footer-col-logo {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 2em;
+    font-weight: bolder;
+    color: #A3A3A3;
+}
+
+#footer-tagline {
+    text-align: center;
+    color: #A3A3A3;
+}
+
+#footer ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#footer li {
+    padding-bottom: 5px;
+}
+
+#footer a {
+    color: #cbcbcb;
 }
