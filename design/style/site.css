@@ -59,6 +59,10 @@ html {
     color: white;
 }
 
+#banner a:hover {
+    color: rgba(255, 255, 255, 0.5);
+}
+
 #content {
     display: flex;
     flex-direction: row;
@@ -225,6 +229,11 @@ html {
 
 #footer a {
     color: #cbcbcb;
+    text-decoration: none;
+}
+
+#footer a:hover {
+    color: #ededed;
 }
 
 /* article */
