@@ -31,137 +31,73 @@
             more.</a></p>
     </div>
     <div id="content">
+        {% set num_articles_left = 4 %}
+        {% set num_articles_right = 5 %}
         <div id="left-col" class="content-col">
-            <div class="article">
-                <div class="article-left">
-                    <a href="#" class="article-title">
-                        <b>Nike loses factory aid as 'racist trainer' row intensifies</b>
-                    </a>
-                    <p>
-                        Arizona has pulled a $1m grant to help Nike build a new factory in a dispute over the firm’s
-                        withdrawal of a trainer allegedly featuring racist symbolism.
-                        <br><br>
-                        The state’s governor had condemned Nike’s decision, which was prompted by complaints about its
-                        use of an old US flag embraced by white nationalists.
-                    </p>
-                    <div class="art-bot">
-                        <div class="art-bot-left">
-                            <a href="#"><b>Continue reading...</b></a>
+            {% for i in range(num_articles_left) %}
+                {% if i < articles|length %}
+                    {% set article = articles[i] %}
+                    {% set article_link = "/article/" + article['published'][0:10] + "/" + article['id'] %}
+                    <div class="article">
+                        <div class="article-left">
+                            <a href={{ article_link }} class="article-title">
+                                <b>{{ article['generated_title'] }}</b>
+                            </a>
+                            <p>
+                                <!-- Uses first two lines of article body, separated by <br><br> -->
+                                {% set lines = article['generated_body'].splitlines() %}
+                                {% set preview = '<br><br>'.join(lines[:2])|safe %}
+
+                                <!-- If first two lines will be too long, uses just first if it is reasonably long-->
+                                {% if preview|length > 650 and lines[0]|length > 100 %}
+                                    {% set preview = lines[0] %}
+                                {% endif %}
+                                {{ preview }}
+                            </p>
+                            <div class="art-bot">
+                                <div class="art-bot-left">
+                                    <a href={{ article_link }}><b>Continue
+                                        reading...</b></a>
+                                </div>
+                                <div class="art-bot-right">
+                                    <span>1 hour ago</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="art-bot-right">
-                            <span>1 hour ago</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="article-right">
-                    <img src="static/img/_107713410_nikebetsyrosstrainers.jpg"/>
-                </div>
-            </div>
-            <br>
-            <hr>
-            <br>
-            <div class="article">
-                <div class="article-left">
-                    <a href="#" class="article-title">
-                        <b>New police search in Suzy Lamplugh case</b>
-                    </a>
-                    <p>
-                        Police investigating the disappearance 33 years ago of estate agent Suzy Lamplugh are searching
-                        land in Worcestershire following “new information”.
-                        <br><br>
-                        The body of Ms Lamplugh, who disappeared from London in 1986, has never been found and her
-                        killer never charged.
-                    </p>
-                    <div class="art-bot">
-                        <div class="art-bot-left">
-                            <a href="#"><b>Continue reading...</b></a>
-                        </div>
-                        <div class="art-bot-right">
-                            <span>8 minutes ago</span>
+                        <div class="article-right">
+                            <img src="static/img/_107713410_nikebetsyrosstrainers.jpg"/>
                         </div>
                     </div>
-                </div>
-                <div class="article-right">
-                    <img src="static/img/_104096744_tv050286712.jpg"/>
-                </div>
-            </div>
-            <br>
-            <hr>
-            <br>
-            <div class="article">
-                <div class="article-left">
-                    <a href="#" class="article-title">
-                        <b>Bankers sent home as Deutsche starts slashing jobs</b>
-                    </a>
-                    <p>
-                        Deutsche Bank has made the first of the 18,000 job cuts announced on Sunday as part of a radical
-                        reorganisation.
-                        <br><br>
-                        Staff working in share trading in London, New York and Tokyo were told that their jobs were
-                        going.
-                    </p>
-                    <div class="art-bot">
-                        <div class="art-bot-left">
-                            <a href="#"><b>Continue reading...</b></a>
-                        </div>
-                        <div class="art-bot-right">
-                            <span>19 minutes ago</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="article-right">
-                    <img src="static/img/_107789618_5e0wsy53.jpg"/>
-                </div>
-            </div>
+                    {% if i < num_articles_left - 1 %}
+                        <br>
+                        <hr>
+                        <br>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
         </div>
         <div id="right-col" class="content-col">
             <div id="top-stories-container">
                 <span id="top-stories">TOP STORIES</span>
                 <br><br><br>
-                <div class="story-row">
-                    <div class="story-left">
-                        1
-                    </div>
-                    <div class="story-right">
-                        <a href="#">Two rail workers killed near Port Talbot after being hit by train</a>
-                    </div>
-                </div>
-                <br><br>
-                <div class="story-row">
-                    <div class="story-left">
-                        2
-                    </div>
-                    <div class="story-right">
-                        <a href="#">Lucy McHugh 'barricaded room to stop violent lodger'</a>
-                    </div>
-                </div>
-                <br><br>
-                <div class="story-row">
-                    <div class="story-left">
-                        3
-                    </div>
-                    <div class="story-right">
-                        <a href="#">VIP abuse accuser Carl Beech 'tortured by generals'</a>
-                    </div>
-                </div>
-                <br><br>
-                <div class="story-row">
-                    <div class="story-left">
-                        4
-                    </div>
-                    <div class="story-right">
-                        <a href="#">MOT: Thousands 'failed to show up' for test in June</a>
-                    </div>
-                </div>
-                <br><br>
-                <div class="story-row">
-                    <div class="story-left">
-                        5
-                    </div>
-                    <div class="story-right">
-                        <a href="#">Kenya stowaway 'may have been airport worker'</a>
-                    </div>
-                </div>
+                {% for i in range(num_articles_left,num_articles_left + num_articles_right) %}
+                    {% if i < articles|length %}
+                        <div class="story-row">
+                            <div class="story-left">
+                                {{ i - num_articles_left + 1 }}
+                            </div>
+
+                            <div class="story-right">
+                                {% set article = articles[i] %}
+                                {% set article_link = "/article/" + article['published'][0:10] + "/" + article['id'] %}
+                                <a href={{ article_link }}>{{ article['generated_title'] }}</a>
+                            </div>
+                        </div>
+                        {% if i < num_articles_left + num_articles_right - 1 %}
+                            <br><br>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
                 <br>
             </div>
         </div>
@@ -196,13 +132,15 @@
             <div class="footer-col">
                 <span class="footer-col-title">WHAT IS THIS?</span>
                 <br><br>
-                This site is a simple demonstration of just how easy it is for news articles to be generated with little
+                This site is a simple demonstration of just how easy it is for news articles to be generated
+                with little
                 to no effort. Our aim is to showcase the dangers posed by artificial intelligence.
             </div>
         </div>
         <br>
         <div id="footer-tagline">
-            This project is licensed under <a href="https://opensource.org/licenses/GPL-3.0">GNU General Public License
+            This project is licensed under <a href="https://opensource.org/licenses/GPL-3.0">GNU General Public
+            License
             Version 3</a>.
         </div>
     </div>

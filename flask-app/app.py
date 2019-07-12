@@ -125,26 +125,13 @@ def get_recent_articles():
 
 app = Flask(__name__)
 
-
 @app.route('/')
-def top_news():
-    return render_template('index.html')
-    # todo serve real frontend
-    # articles = storage.get_recent_articles(max_articles_returned, None)
-    #
-    # body = ''
-    # i = 1
-    # for article in articles:
-    #     body += '<b>Article ' + str(i) + '.</b><br><br>'
-    #     body += '<b>Original headline: </b>' + article['original_title'] + '<br><br>'
-    #     body += '<b>From these real news feeds: </b>' + str(article['feeds']) + '<br><br>'
-    #     body += '<b>Published: </b>' + article['published'] + '<br><br>'
-    #     body += '<b>Generated headline: </b>' + article['generated_title'] + '<br><br>'
-    #     body += '<b>Generated body: </b>' + article['generated_body'].replace('\n', '<br><br>') + '<br><br><br><br>'
-    #
-    #     i += 1
-    #
-    # return body
+def homepage():
+    articles = storage.get_recent_articles(max_articles_returned, 'top-news')
+    # todo debug
+    print('len: %i' % len(articles))
+    return render_template('index.html', articles=articles)
+
 
 @app.route('/article/<date>/<id>')
 def view_article(date, id):
