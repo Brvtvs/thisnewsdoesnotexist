@@ -12,7 +12,7 @@ from time import mktime
 from time import sleep
 
 import feedparser
-from flask import Flask, abort, request
+from flask import Flask, abort, request, render_template
 
 import grover
 import storage
@@ -125,26 +125,23 @@ def get_recent_articles():
 
 app = Flask(__name__)
 
-
 @app.route('/')
-def top_news():
-    # todo serve real react frontend
-    articles = storage.get_recent_articles(max_articles_returned, None)
+def homepage():
+    articles = storage.get_recent_articles(max_articles_returned, 'top-news')
+    # todo debug
+    print('len: %i' % len(articles))
+    return render_template('index.html', articles=articles)
 
-    body = ''
-    i = 1
-    for article in articles:
-        body += '<b>Article ' + str(i) + '.</b><br><br>'
-        body += '<b>Original headline: </b>' + article['original_title'] + '<br><br>'
-        body += '<b>From these real news feeds: </b>' + str(article['feeds']) + '<br><br>'
-        body += '<b>Published: </b>' + article['published'] + '<br><br>'
-        body += '<b>Generated headline: </b>' + article['generated_title'] + '<br><br>'
-        body += '<b>Generated body: </b>' + article['generated_body'].replace('\n', '<br><br>') + '<br><br><br><br>'
 
-        i += 1
+@app.route('/article/<date>/<id>')
+def view_article(date, id):
+    article = storage.get_article(date, id)
 
-    return body
+    # todo add good-looking 404 behavior
+    if not article:
+        abort(404, 'Article not found.')
 
+    return render_template('article.html', article=article)
 
 @app.route('/api/v1/articles')
 def get_articles():
