@@ -10,10 +10,12 @@ from datetime import datetime, date
 from multiprocessing import Process
 from time import mktime
 from time import sleep
+from google_image_search import get_image_link_for_article
 
 import feedparser
 from flask import Flask, abort, request, render_template
 
+import config
 import grover
 import storage
 
@@ -93,12 +95,16 @@ def generate_articles():
             generated_title = grover.generate_article_title(article['title'])
             generated_body = grover.generate_article_body(generated_title)
 
+            # todo look for a way to filter out what results are going to be bad
+            image = get_image_link_for_article(generated_title)
+
             generated_articles.append({
                 'id': id,
                 'original_title': article['title'],
                 'published': datetime.fromtimestamp(mktime(article.published_parsed)),
                 'generated_title': generated_title,
                 'generated_body': generated_body,
+                'matched_image_link': image,
                 'feeds': feeds_by_title[article['title']]
             })
         except Exception:
@@ -172,4 +178,4 @@ def get_article(date: str, id: str):
 if __name__ == '__main__':
     background_process = Process(target=generate_articles_task)
     background_process.start()
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=config.port)

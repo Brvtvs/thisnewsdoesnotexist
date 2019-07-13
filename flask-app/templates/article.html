@@ -15,7 +15,7 @@
     <div id="header">
         <h1>THIS NEWS DOES NOT EXIST</h1>
         <ul>
-            <li><a href="#">Home</a></li>
+            <li><a href="/">Home</a></li>
             <li><a href="#">World</a></li>
             <li><a href="#">Business</a></li>
             <li><a href="#">Technology</a></li>
@@ -42,7 +42,7 @@
         &nbsp;&nbsp;&nbsp;
         <i class="fab fa-twitter-square fa-2x" style="color: #1DA1F2;"></i>
         <br><br><br>
-        <img src="/static/img/b40aa74b83074d869385fcdcffef43c1_18.jpg"/>
+        <img src="{{ article['matched_image_link'] }}"/>
         <br><br>
         <p>
             {{ article['generated_body'].replace('\n', '<br><br>') | safe }}
