@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 # todo This is hacky shit. Do persistence in a way that scales and does concurrency safely.
 # todo  Possibly just replace this with an object store that handles concurrent reads/writes? We do not really need
@@ -10,6 +11,11 @@ storage_file_base = storage_folder + '%s.json'
 if not os.path.isdir(storage_folder):
     os.mkdir(storage_folder)
 
+def published_as_datetime(article):
+    published = article['published']
+    if type(published) == str:
+        published = datetime.strptime(published, '%Y-%m-%d %H:%M:%S')
+    return published
 
 def get_article(date, id):
     file = storage_file_base % str(date)
@@ -56,7 +62,7 @@ def get_recent_articles(max_articles: int, feed):
         i += 1
 
     # takes the newest articles up to the max
-    articles.sort(key=lambda a: a['published'], reverse=True)
+    articles.sort(key=lambda a: published_as_datetime(a), reverse=True)
     articles = articles[:max_articles]
 
     return articles
@@ -67,7 +73,7 @@ def put_articles(articles):
 
     # organizes new articles by date, which is how theyll be stored
     for a in articles:
-        date = a['published'].date()
+        date = published_as_datetime(a).date()
         if date in puts_by_date:
             puts_by_date[date].append(a)
         else:
@@ -96,3 +102,30 @@ def put_articles(articles):
         file = storage_file_base % str(date)
         with open(file, 'wt') as json_file:
             json.dump(by_date[date], json_file, sort_keys=True, default=str)
+
+
+def update_article(article):
+    """Updates the data for an article. Must not change its date or id."""
+
+    date = published_as_datetime(article).date()
+    id = article['id']
+
+    file = storage_file_base % str(date)
+    if not os.path.exists(file):
+        raise Exception('No article found with date %s and id %s' % (date, id))
+
+    with open(file, 'rt') as json_file:
+        json_data = json.load(json_file)
+        articles = json_data['articles']
+
+    for i in range(len(articles)):
+        a = articles[i]
+        if a['id'] == id:
+            articles[i] = article
+            json_data['articles'] = articles
+
+            with open(file, 'wt') as json_file:
+                json.dump(json_data, json_file, sort_keys=True, default=str)
+                return
+
+    raise Exception('No article found with date %s and id %s' % (date, id))
