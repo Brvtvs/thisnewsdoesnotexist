@@ -31,12 +31,13 @@
             out more.</a></p>
     </div>
     <div id="content">
-        {% set num_articles_left = 4 %}
-        {% set num_articles_right = 5 %}
+        {% set num_articles_left = 8 %}
+        {% set num_articles_right = 10 %}
         <div id="left-col" class="content-col">
 
             <!-- TODO use real publication times -->
-            {% set mocked_times = ['8 minutes ago', '19 minutes ago', '53 minutes ago', '1 hour ago', '3 hours ago', '4 hours ago', '6 hours ago'] %}
+            {% set mocked_times = ['8 minutes ago', '19 minutes ago', '53 minutes ago', '1 hour ago', '3 hours ago',
+            '4 hours ago', '6 hours ago', '6 hours ago', '10 hours ago', '13 hours ago', '17 hours ago', '1 day ago'] %}
 
             {% for i in range(num_articles_left) %}
                 {% if i < articles|length %}
@@ -48,15 +49,7 @@
                                 <b>{{ article['generated_title'] }}</b>
                             </a>
                             <p>
-                                <!-- Uses first two lines of article body, separated by <br><br> -->
-                                {% set lines = article['generated_body'].splitlines() %}
-                                {% set preview = '<br><br>'.join(lines[:2])|safe %}
-
-                                <!-- If first two lines will be too long, uses just first if it is reasonably long-->
-                                {% if preview|length > 650 and lines[0]|length > 100 %}
-                                    {% set preview = lines[0] %}
-                                {% endif %}
-                                {{ preview }}
+                                {{ display_funcs.get_article_preview_text(article)|safe }}
                             </p>
                             <div class="art-bot">
                                 <div class="art-bot-left">

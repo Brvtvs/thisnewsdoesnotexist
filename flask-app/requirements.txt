@@ -8,3 +8,4 @@ feedparser
 requests
 spacy
 google-api-python-client
+nltk

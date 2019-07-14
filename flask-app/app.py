@@ -10,7 +10,7 @@ from datetime import datetime, date
 from multiprocessing import Process
 from time import mktime
 from time import sleep
-from google_image_search import get_image_link_for_article
+import display_funcs
 
 import feedparser
 from flask import Flask, abort, request, render_template
@@ -18,6 +18,8 @@ from flask import Flask, abort, request, render_template
 import config
 import grover
 import storage
+from google_image_search import get_image_link_for_article
+
 
 # to throttle the generation, only generates a fake article from about 1 out of every X articles in the feed
 # todo may want to make sure that we get coverage of different topics, rather than picking them essentially at random
@@ -131,12 +133,11 @@ def get_recent_articles():
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def homepage():
     articles = storage.get_recent_articles(max_articles_returned, 'top-news')
-    # todo debug
-    print('len: %i' % len(articles))
-    return render_template('index.html', articles=articles)
+    return render_template('index.html', articles=articles, display_funcs=display_funcs)
 
 
 @app.route('/article/<date>/<id>')
@@ -148,6 +149,7 @@ def view_article(date, id):
         abort(404, 'Article not found.')
 
     return render_template('article.html', article=article)
+
 
 @app.route('/api/v1/articles')
 def get_articles():
