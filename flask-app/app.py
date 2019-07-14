@@ -178,6 +178,7 @@ def get_article(date: str, id: str):
 
 
 if __name__ == '__main__':
-    background_process = Process(target=generate_articles_task)
-    background_process.start()
+    if config.generate_new_articles:
+        background_process = Process(target=generate_articles_task)
+        background_process.start()
     app.run(host='0.0.0.0', port=config.port)
