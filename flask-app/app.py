@@ -151,6 +151,11 @@ def view_article(date, id):
     return render_template('article.html', article=article)
 
 
+@app.route('/about')
+def view_about():
+    return render_template('about.html')
+
+
 @app.route('/api/v1/articles')
 def get_articles():
     # todo handle io errors because we have no actual concurrency control
