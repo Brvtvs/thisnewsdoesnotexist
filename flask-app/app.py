@@ -43,9 +43,9 @@ rss_feeds = {
     'liberal-opinion-2': 'http://www.thenation.com/feed/?post_type=article',
 }
 special_grover_configs = {
-    'conservative-opinion': {'domain': 'infowars.com'},
+    'conservative-opinion': {'domain': 'redstate.com'},
     'conservative-opinion-2': {'domain': 'redstate.com'},
-    'liberal-opinion': {'domain': 'alternet.org'},
+    'liberal-opinion': {'domain': 'thenation.com'},
     'liberal-opinion-2': {'domain': 'thenation.com'},
 }
 
@@ -127,7 +127,8 @@ def generate_articles():
                 'matched_image_link': image,
                 'feeds': feeds
             })
-        except Exception:
+        except Exception as e:
+            print(e)
             print('Failed to generate an article from %s. Ignoring it for now...' % article['title'])
 
     print('Done generating %i new articles' % len(generated_articles))
