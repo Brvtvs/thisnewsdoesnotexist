@@ -151,6 +151,17 @@ def view_article(date, id):
     return render_template('article.html', article=article)
 
 
+@app.route('/news/<category>')
+def view_category(category):
+
+    if category not in rss_feeds:
+        abort(400, 'Unrecognized category.')
+
+    cat_articles = storage.get_recent_articles(7, category)
+
+    return render_template('category.html', cat_articles=cat_articles, display_funcs=display_funcs)
+
+
 @app.route('/api/v1/articles')
 def get_articles():
     # todo handle io errors because we have no actual concurrency control
