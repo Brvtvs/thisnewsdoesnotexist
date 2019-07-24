@@ -183,6 +183,11 @@ def view_category(category):
     return render_template('category.html', cat_articles=cat_articles, display_funcs=display_funcs)
 
 
+@app.route('/about')
+def view_about():
+    return render_template('about.html')
+
+
 @app.route('/api/v1/articles')
 def get_articles():
     # todo handle io errors because we have no actual concurrency control
