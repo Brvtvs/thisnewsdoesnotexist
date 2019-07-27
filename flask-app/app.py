@@ -169,7 +169,7 @@ def view_article(date, id):
     if not article:
         abort(404, 'Article not found.')
 
-    return render_template('article.html', article=article)
+    return render_template('article.html', article=article, display_funcs=display_funcs)
 
 
 @app.route('/news/<category>')

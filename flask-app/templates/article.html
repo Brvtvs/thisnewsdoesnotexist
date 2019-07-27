@@ -46,7 +46,7 @@
         <img src="{{ article['matched_image_link'] }}"/>
         <br><br>
         <p>
-            {{ article['generated_body'].replace('\n', '<br><br>') | safe }}
+            {{ display_funcs.get_clean_article_text(article).replace('\n', '<br><br>') | safe }}
 
         </p>
     </div>
