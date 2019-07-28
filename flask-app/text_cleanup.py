@@ -8,6 +8,7 @@ strip_from_anywhere = [
     "And please follow Alex Parker on Twitter and Facebook.",
     "Please send me information on current events (all items on RedState.com).",
     "Please enable Javascript to watch this video",
+    "Download the ERR News app for Android and iOS now and never miss an update!",
 ]
 strip_from_anywhere_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     '\(reuters\)',
@@ -53,6 +54,21 @@ strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "Read more:?",
     "\(?BBC\)?",
     "Learn more at: mru.ca",
+    "T?h?e? ?Associated Press",
+    "Updated",
+    "Comments",
+    "\(?Adds LSE comment, detail\)?",
+    "©? ?Thomson Reuters 2019",
+    "World",
+    "business",
+    "technology",
+    "sports",
+    "health",
+    "entertainment",
+    "advertisement",
+    "Breaking News World",
+    "AP",
+    "Don’t Miss:",
 ]))
 
 # todo implement
@@ -115,4 +131,4 @@ def clean_body(body: str):
 
     # todo strip any errant periods?
 
-    return '\n'.join(filtered_lines)
+    return '\n'.join(filtered_lines).strip()
