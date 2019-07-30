@@ -18,6 +18,7 @@ import config
 import display_funcs
 import grover
 import storage
+import text_cleanup
 from google_image_search import get_image_link_for_article
 from storage import published_as_datetime
 
@@ -108,7 +109,16 @@ def generate_articles():
 
             # todo is there a better way to seed the generator than this?
             generated_title = grover.generate_article_title(article['title'], grover_params)
+
             generated_body = grover.generate_article_body(generated_title, grover_params)
+            # runs generated body through sanity check
+            body_good = False
+            for i in range(3):
+                if not text_cleanup.is_body_irreparable(generated_body):
+                    body_good = True
+                    break
+            if not body_good:
+                raise Exception("Failed to generate a good body after 3 tries for title: %s" % generated_title)
 
             # todo look for a way to filter out what results are going to be bad
             image = get_image_link_for_article(generated_title)
@@ -174,7 +184,6 @@ def view_article(date, id):
 
 @app.route('/news/<category>')
 def view_category(category):
-
     if category not in rss_feeds:
         abort(400, 'Unrecognized category.')
 

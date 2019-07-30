@@ -17,8 +17,12 @@ strip_from_anywhere_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "Copyright © 2018 by Creative Commons\. All rights reserved\. This material may not be published, broadcast, rewritten or redistributed\.? ?",
     "This work is licensed under a Creative Commons Attribution-Share Alike 3\.0 License\.? ?",
     "Neuer Inhalt Horizontal Line",
-    "^,"
-    "Have a tip\? Tell us\. nj\.com/tips"
+    "^,",
+    "Have a tip\? Tell us\. nj\.com/tips",
+    "This slideshow requires JavaScript\.?",
+    "Ruth Marcus' email address is ruthmarcus@washpost\.com\.?",
+    "\(c\) 2019, Washington Post Writers Group\.?",
+    "Follow Labor Party and Progressives@RedState\.com for more on the Left and right\.?",
 ]))
 strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "^Related$",
@@ -69,7 +73,17 @@ strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "Breaking News World",
     "AP",
     "Don’t Miss:",
+    "Watch more above\.?",
+    "Follow Labor Party and Progressives@RedState\.com for more on the Left and right\.",
+    "Breaking News National",
+    "National",
+    "Subscribe to Sports Now newsletter By clicking Sign up, you agree to our privacy policy\.?",
+    "\(Keystone\)?",
+    "swissinfo\.ch with agencies/dos",
+    "swissinfo EN Teaser Join us on Facebook! swissinfo\.ch Join us on Facebook!",
 ]))
+
+# todo block title-like paragraphs at the end of the article? Often may be non-existent links to other articles
 
 # todo implement
 strip_sentences_with_prefix = [
@@ -126,9 +140,29 @@ def clean_body(body: str):
 
     last_line = filtered_lines[len(filtered_lines) - 1]
 
-    if last_line.lower().startswith('reporting by ') or last_line.lower().startswith('(reporting by '):
+    if last_line.lower().startswith('reporting by ') or last_line.lower().startswith('(reporting by ') \
+            or last_line.lower().startswith('this article was written by '):
         filtered_lines = filtered_lines[:-1]
 
     # todo strip any errant periods?
 
     return '\n'.join(filtered_lines).strip()
+
+
+def is_body_irreparable(body: str):
+    """Gets whether the generated body of an article should just be thrown out."""
+    body = clean_body(body)
+
+    # throws out all-caps articles because grover periodically generates "articles" that are really transcripts that
+    # tend to be completely nonsensical
+    lower_count = 0
+    upper_count = 0
+    for i in body:
+        if i.islower():
+            lower_count += 1
+        elif i.isupper():
+            upper_count += 1
+    if upper_count > lower_count:
+        return True
+
+    return False
