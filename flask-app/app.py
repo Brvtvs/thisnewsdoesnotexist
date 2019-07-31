@@ -109,6 +109,14 @@ def generate_articles():
 
             # todo is there a better way to seed the generator than this?
             generated_title = grover.generate_article_title(article['title'], grover_params)
+            # runs generated body through sanity check
+            title_good = False
+            for i in range(3):
+                if not text_cleanup.is_title_irreparable(generated_title):
+                    title_good = True
+                    break
+            if not title_good:
+                raise Exception("Failed to generate good title after 3 tries for original title: %s" % article['title'])
 
             generated_body = grover.generate_article_body(generated_title, grover_params)
             # runs generated body through sanity check

@@ -23,6 +23,8 @@ strip_from_anywhere_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "Ruth Marcus' email address is ruthmarcus@washpost\.com\.?",
     "\(c\) 2019, Washington Post Writers Group\.?",
     "Follow Labor Party and Progressives@RedState\.com for more on the Left and right\.?",
+    "Get the latest updates right in your inbox\.?",
+    "Subscribe to NJ\.com’s newsletters\.",
 ]))
 strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "^Related$",
@@ -41,46 +43,46 @@ strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "^About the Author:?$",
     "^Imported and Older Comments:?$",
     "^Featured image: Pool/Getty Images$",
-    "SWI swissinfo\.ch on Instagram SWI swissinfo\.ch on Instagram",
-    "AGENCE FRANCE-PRESSE",
-    "\(Repeats for more subscribers with no changes to text\)",
-    "Get the latest updates right in your inbox\. Subscribe to NJ\.com’s newsletters\.",
-    "Copyright Associated Press\.?",
-    "From PA",
-    "Bloomberg\.com",
-    "- Advertisement –",
-    "Continue Reading Below",
-    "Read the full article »",
-    "MA",
-    "^Relevant RedState links in this article.*",
-    "SEE MORE VIDEOS",
-    "Reuters/AP",
-    "Read more:?",
-    "\(?BBC\)?",
-    "Learn more at: mru.ca",
-    "T?h?e? ?Associated Press",
-    "Updated",
-    "Comments",
-    "\(?Adds LSE comment, detail\)?",
-    "©? ?Thomson Reuters 2019",
-    "World",
-    "business",
-    "technology",
-    "sports",
-    "health",
-    "entertainment",
-    "advertisement",
-    "Breaking News World",
-    "AP",
-    "Don’t Miss:",
-    "Watch more above\.?",
-    "Follow Labor Party and Progressives@RedState\.com for more on the Left and right\.",
-    "Breaking News National",
-    "National",
-    "Subscribe to Sports Now newsletter By clicking Sign up, you agree to our privacy policy\.?",
-    "\(Keystone\)?",
-    "swissinfo\.ch with agencies/dos",
-    "swissinfo EN Teaser Join us on Facebook! swissinfo\.ch Join us on Facebook!",
+    "^SWI swissinfo\.ch on Instagram SWI swissinfo\.ch on Instagram$",
+    "^AGENCE FRANCE-PRESSE$",
+    "^\(Repeats for more subscribers with no changes to text\)$",
+    "^Copyright Associated Press\.?$",
+    "^From PA$",
+    "^Bloomberg\.com$",
+    "^-? Advertisement –?$",
+    "^Continue Reading Below$",
+    "^Read the full article ?»?$",
+    "^MA$",
+    "^Relevant RedState links in this article.*$",
+    "^SEE MORE VIDEOS$",
+    "^Reuters/AP$",
+    "^Read more:?$",
+    "^\(?BBC\)?$",
+    "^Learn more at: mru.ca$",
+    "^T?h?e? ?Associated Press$",
+    "^Updated$",
+    "^Comments$",
+    "^\(?Adds LSE comment, detail\)?$",
+    "^©? ?Thomson Reuters 2019$",
+    "^World$",
+    "^business$",
+    "^technology$",
+    "^sports$",
+    "^health$",
+    "^entertainment$",
+    "^advertisement$",
+    "^Breaking News World$",
+    "^AP$",
+    "^Don’t Miss:$",
+    "^Watch more above\.?$",
+    "^Follow Labor Party and Progressives@RedState\.com for more on the Left and right\.$",
+    "^Breaking News National$",
+    "^National$",
+    "^Subscribe to Sports Now newsletter By clicking Sign up, you agree to our privacy policy\.?$",
+    "^\(Keystone\)?$",
+    "^swissinfo\.ch with agencies/dos$",
+    "^swissinfo EN Teaser Join us on Facebook! swissinfo\.ch Join us on Facebook!$",
+    "^Follow Colvin on Twitter at https://twitter\.com/colvinj$",
 ]))
 
 # todo block title-like paragraphs at the end of the article? Often may be non-existent links to other articles
@@ -120,7 +122,7 @@ def clean_body(body: str):
         include = True
 
         for strip_regex in strip_paragraphs_nocase:
-            if strip_regex.match(line) != None:
+            if strip_regex.match(line) is not None:
                 include = False
                 break
 
@@ -137,12 +139,12 @@ def clean_body(body: str):
 
         if include and len(line) > 0:
             filtered_lines.append(line)
+    if len(filtered_lines) > 0:
+        last_line = filtered_lines[len(filtered_lines) - 1]
 
-    last_line = filtered_lines[len(filtered_lines) - 1]
-
-    if last_line.lower().startswith('reporting by ') or last_line.lower().startswith('(reporting by ') \
-            or last_line.lower().startswith('this article was written by '):
-        filtered_lines = filtered_lines[:-1]
+        if last_line.lower().startswith('reporting by ') or last_line.lower().startswith('(reporting by ') \
+                or last_line.lower().startswith('this article was written by '):
+            filtered_lines = filtered_lines[:-1]
 
     # todo strip any errant periods?
 
@@ -164,5 +166,23 @@ def is_body_irreparable(body: str):
             upper_count += 1
     if upper_count > lower_count:
         return True
+
+    return False
+
+
+filter_titles_with = list(map(lambda s: re.compile(s, re.IGNORECASE), [
+    "john mccain",
+    "senator mccain",
+    "theresa may",
+    "pm may",
+    "paul ryan",
+    "speaker ryan",
+]))
+
+
+def is_title_irreparable(title: str):
+    for bad_regex in filter_titles_with:
+        if bad_regex.match(title) is not None:
+            return True
 
     return False
