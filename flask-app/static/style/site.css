@@ -53,6 +53,8 @@ html {
     background-color: #EC6060;
     padding-top: 1px;
     padding-bottom: 1px;
+    position: sticky;
+    top: 0;
 }
 
 #banner a {
