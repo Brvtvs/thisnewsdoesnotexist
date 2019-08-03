@@ -11,11 +11,13 @@ storage_file_base = storage_folder + '%s.json'
 if not os.path.isdir(storage_folder):
     os.mkdir(storage_folder)
 
+
 def published_as_datetime(article):
     published = article['published']
     if type(published) == str:
         published = datetime.strptime(published, '%Y-%m-%d %H:%M:%S')
     return published
+
 
 def get_article(date, id):
     file = storage_file_base % str(date)

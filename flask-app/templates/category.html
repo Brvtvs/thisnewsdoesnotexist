@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FAKE: {{ article['generated_title'] }}</title>
-    <!-- Seed article's title: {{ article['original_title'] }} -->
+    <title>This News Does Not Exist</title>
 
     <link type="text/css" rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.0/normalize.css"/>
     <link type="text/css" rel="stylesheet" href="/static/style/site.css"/>
@@ -12,6 +11,7 @@
 
     <link rel="stylesheet" href="https://indestructibletype.com/fonts/Jost.css" type="text/css" charset="utf-8"/>
 </head>
+<body>
 <div id="wrapper">
     <div id="header">
         <h1>THIS NEWS DOES NOT EXIST</h1>
@@ -31,27 +31,54 @@
                 href="/about">Find
             out more.</a></p>
     </div>
-    <div id="content-article">
-        <span id="article-page-title">
-            {{ article['generated_title'] }}
-        </span>
-        <br><br>
-        <span id="article-page-date">
-            1 hour ago
-        </span>
-        &nbsp;&nbsp;&nbsp;
-        <i class="fab fa-facebook-square fa-2x" style="color: #3C5A99;"></i>
-        &nbsp;&nbsp;&nbsp;
-        <i class="fab fa-twitter-square fa-2x" style="color: #1DA1F2;"></i>
-        <br><br><br>
-        <img src="{{ article['matched_image_link'] }}"/>
-        <br><br>
-        <p>
-            {{ display_funcs.get_clean_article_text(article).replace('\n', '<br><br>') | safe }}
+    <div id="category-content">
 
-        </p>
+        <div id="category-main-article">
+
+            {% set main_article = cat_articles[0] %}
+            {% set article_link = "/article/" + main_article['published'][0:10] + "/" + main_article['id'] %}
+
+            <div id="category-main-article-left">
+                <a href="{{ article_link }}" id="category-main-article-title">
+                    {{ main_article['generated_title'] }}
+                </a>
+
+                <br><br>
+
+                <span id="category-main-article-content">
+                    {{ display_funcs.get_article_preview_text(main_article)|safe }}
+                </span>
+            </div>
+
+            <div id="category-main-article-right">
+                <img src="{{ main_article['matched_image_link'] }}" style="width: 100%;"/>
+            </div>
+
+        </div>
+
+        <hr>
+        <br>
+
+        <div id="category-sub-articles">
+
+            {% for i in range(cat_articles|length - 1) %}
+
+                {% set article_link = "/article/" + cat_articles[i + 1]['published'][0:10] + "/" + cat_articles[i + 1]['id'] %}
+
+                <div class="category-sub-article">
+                    <ul>
+                        <li>
+                            <a href="{{ article_link }}">{{ cat_articles[i + 1]['generated_title'] }}</a>
+                        </li>
+                    </ul>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
     </div>
-    <br>
+    <br><br>
     <div id="footer">
         <div id="footer-content">
             <div class="footer-col">

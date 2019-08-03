@@ -10,20 +10,21 @@ from datetime import datetime, date
 from multiprocessing import Process
 from time import mktime
 from time import sleep
-import display_funcs
 
 import feedparser
 from flask import Flask, abort, request, render_template
 
 import config
+import display_funcs
 import grover
 import storage
+import text_cleanup
 from google_image_search import get_image_link_for_article
-
+from storage import published_as_datetime
 
 # to throttle the generation, only generates a fake article from about 1 out of every X articles in the feed
 # todo may want to make sure that we get coverage of different topics, rather than picking them essentially at random
-gen_1_for_each_x_articles = 5
+gen_1_for_each_x_articles = 4
 
 # amount of time to wait in between scraping the rss feed(s)
 seconds_between_generation = 1200
@@ -37,6 +38,16 @@ rss_feeds = {
     'health': 'http://feeds.reuters.com/reuters/healthNews',
     'entertainment': 'http://feeds.reuters.com/reuters/entertainment',
     'sports': 'http://feeds.reuters.com/reuters/sportsNews',
+    'conservative-opinion': 'https://www.washingtontimes.com/rss/headlines/opinion/commentary/',
+    'conservative-opinion-2': 'https://www.washingtontimes.com/rss/headlines/opinion/editorials/',
+    'liberal-opinion': 'http://jacobinmag.com/feed',
+    'liberal-opinion-2': 'http://www.thenation.com/feed/?post_type=article',
+}
+special_grover_configs = {
+    'conservative-opinion': {'domain': 'redstate.com'},
+    'conservative-opinion-2': {'domain': 'redstate.com'},
+    'liberal-opinion': {'domain': 'thenation.com'},
+    'liberal-opinion-2': {'domain': 'thenation.com'},
 }
 
 max_articles_returned = 50
@@ -88,17 +99,42 @@ def generate_articles():
     generated_articles = []
     for article in uncached_articles:
         try:
-            # Removes all non-word characters (everything except numbers and letters)
-            id = re.sub(r"[^\w\s]", '', article['title'].lower())
-            # Replaces all runs of whitespace with a single dash
-            id = re.sub(r"\s+", '-', id)
+            feeds = feeds_by_title[article['title']]
+
+            grover_params = None
+            for feed_id, grover_conf in special_grover_configs.items():
+                if feed_id in feeds:
+                    grover_params = grover_conf
+                    break
 
             # todo is there a better way to seed the generator than this?
-            generated_title = grover.generate_article_title(article['title'])
-            generated_body = grover.generate_article_body(generated_title)
+            generated_title = grover.generate_article_title(article['title'], grover_params)
+            # runs generated body through sanity check
+            title_good = False
+            for i in range(3):
+                if not text_cleanup.is_title_irreparable(generated_title):
+                    title_good = True
+                    break
+            if not title_good:
+                raise Exception("Failed to generate good title after 3 tries for original title: %s" % article['title'])
+
+            generated_body = grover.generate_article_body(generated_title, grover_params)
+            # runs generated body through sanity check
+            body_good = False
+            for i in range(3):
+                if not text_cleanup.is_body_irreparable(generated_body):
+                    body_good = True
+                    break
+            if not body_good:
+                raise Exception("Failed to generate a good body after 3 tries for title: %s" % generated_title)
 
             # todo look for a way to filter out what results are going to be bad
             image = get_image_link_for_article(generated_title)
+
+            # Removes all non-word characters (everything except numbers and letters)
+            id = re.sub(r"[^\w\s]", '', generated_title.lower())
+            # Replaces all runs of whitespace with a single dash
+            id = re.sub(r"\s+", '-', id)
 
             generated_articles.append({
                 'id': id,
@@ -107,9 +143,10 @@ def generate_articles():
                 'generated_title': generated_title,
                 'generated_body': generated_body,
                 'matched_image_link': image,
-                'feeds': feeds_by_title[article['title']]
+                'feeds': feeds
             })
-        except Exception:
+        except Exception as e:
+            print(e)
             print('Failed to generate an article from %s. Ignoring it for now...' % article['title'])
 
     print('Done generating %i new articles' % len(generated_articles))
@@ -127,17 +164,19 @@ def generate_articles_task():
         sleep(seconds_between_generation)
 
 
-def get_recent_articles():
-    return storage.get_recent_articles(max_articles_returned)
-
-
 app = Flask(__name__)
 
 
 @app.route('/')
 def homepage():
     articles = storage.get_recent_articles(max_articles_returned, 'top-news')
-    return render_template('index.html', articles=articles, display_funcs=display_funcs)
+    opinion_feeds = ('conservative-opinion', 'conservative-opinion-2', 'liberal-opinion', 'liberal-opinion-2')
+    opinions = []
+    for feed in opinion_feeds:
+        opinions = opinions + storage.get_recent_articles(round(max_articles_returned / len(opinion_feeds)), feed)
+    opinions.sort(key=lambda a: published_as_datetime(a), reverse=True)
+
+    return render_template('index.html', articles=articles, opinions=opinions, display_funcs=display_funcs)
 
 
 @app.route('/article/<date>/<id>')
@@ -148,7 +187,17 @@ def view_article(date, id):
     if not article:
         abort(404, 'Article not found.')
 
-    return render_template('article.html', article=article)
+    return render_template('article.html', article=article, display_funcs=display_funcs)
+
+
+@app.route('/news/<category>')
+def view_category(category):
+    if category not in rss_feeds:
+        abort(400, 'Unrecognized category.')
+
+    cat_articles = storage.get_recent_articles(7, category)
+
+    return render_template('category.html', cat_articles=cat_articles, display_funcs=display_funcs)
 
 
 @app.route('/about')
