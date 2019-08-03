@@ -197,6 +197,3 @@ def is_title_irreparable(title: str):
             return True
 
     return False
-
-
-print(clean_body('Follow John Lemire on Twatter at http://twitter.com/JonLemire'))
