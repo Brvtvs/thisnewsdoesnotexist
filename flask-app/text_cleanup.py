@@ -9,10 +9,12 @@ strip_from_anywhere = [
     "Please send me information on current events (all items on RedState.com).",
     "Please enable Javascript to watch this video",
     "Download the ERR News app for Android and iOS now and never miss an update!",
+    "READ THE REST",
 ]
 strip_from_anywhere_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     '\(reuters\)',
     '\(AFP\)',
+    '\(AP\)',
     '© 2019 AFP',
     "Copyright © 2018 by Creative Commons\. All rights reserved\. This material may not be published, broadcast, rewritten or redistributed\.? ?",
     "This work is licensed under a Creative Commons Attribution-Share Alike 3\.0 License\.? ?",
@@ -83,6 +85,13 @@ strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "^swissinfo\.ch with agencies/dos$",
     "^swissinfo EN Teaser Join us on Facebook! swissinfo\.ch Join us on Facebook!$",
     "^Follow Colvin on Twitter at https://twitter\.com/colvinj$",
+    "^© 2018 AFP$",
+    "^Follow \w+(\s\w+)?\son Twitter.*",
+    "^Share on Facebook SHARE$",
+    "^Share on \w+(\s\w+)$",
+    "^Reuters$",
+    "^Photo(:\s\w+)?$",
+    "^Story continues below…?:?\.?$",
 ]))
 
 # todo block title-like paragraphs at the end of the article? Often may be non-existent links to other articles
@@ -143,7 +152,8 @@ def clean_body(body: str):
         last_line = filtered_lines[len(filtered_lines) - 1]
 
         if last_line.lower().startswith('reporting by ') or last_line.lower().startswith('(reporting by ') \
-                or last_line.lower().startswith('this article was written by '):
+                or last_line.lower().startswith('this article was written by ') or last_line.lower().startswith(
+            'additional reporting by ') or last_line.lower().startswith('(additional reporting by '):
             filtered_lines = filtered_lines[:-1]
 
     # todo strip any errant periods?
@@ -177,6 +187,7 @@ filter_titles_with = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "pm may",
     "paul ryan",
     "speaker ryan",
+    "video",
 ]))
 
 
@@ -186,3 +197,6 @@ def is_title_irreparable(title: str):
             return True
 
     return False
+
+
+print(clean_body('Follow John Lemire on Twatter at http://twitter.com/JonLemire'))
