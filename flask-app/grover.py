@@ -9,11 +9,15 @@ grover_url = 'https://api.grover.allenai.org/api/ask'
 def request_json():
     return {
         "target": "",
-        "title": "",
-        "article": "",
-        "domain": "",
-        "date": "",
-        "authors": ""
+        "meta": {
+            "title": "",
+            "summary": "",
+            "text": "",
+            "domain": "",
+            "url": "",
+            "publish_date": "",
+            "authors": ""
+        }
     }
 
 
@@ -27,7 +31,7 @@ def generate_article_title(prompt, grover_parameters=None):
         grover_parameters = {}
 
     request_body = request_json()
-    request_body["date"] = date.today().strftime("%B %d, %Y")
+    request_body["meta"]["publish_date"] = date.today().strftime("%B %d, %Y")
 
     for k, v in grover_parameters.items():
         request_body[k] = v
@@ -36,7 +40,7 @@ def generate_article_title(prompt, grover_parameters=None):
 
     # TODO putting the prompt as the article's body seems to have some impact on making the generated title relate to
     #  the prompt, but the model is expecting an actual article body, not arbitrary text, so this may behave unexpectedly
-    request_body["article"] = prompt
+    request_body["meta"]["text"] = prompt
 
     # todo testing
     print('Making grover query for title with this config:')
@@ -51,13 +55,13 @@ def generate_article_body(article_title, grover_parameters=None):
         grover_parameters = {}
 
     request_body = request_json()
-    request_body["date"] = date.today().strftime("%B %d, %Y")
+    request_body["meta"]["publish_date"] = date.today().strftime("%B %d, %Y")
 
     for k, v in grover_parameters.items():
         request_body[k] = v
 
     request_body["target"] = "article"
-    request_body["title"] = article_title
+    request_body["meta"]["title"] = article_title
 
     # todo testing
     print('Making grover query for body with this config:')

@@ -1,0 +1,8 @@
+{
+  "absolute_path":"/tex-mex/grover/",
+  "generate_script_path":"sample/contextual_generate.py",
+  "model":"base",
+  "config_path":"lm/configs/{model}.json",
+  "model_path":"models/{model}/model.ckpt",
+  "metadata_path":"sample/meta.json"
+}
