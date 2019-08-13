@@ -46,6 +46,42 @@ html {
     text-decoration: underline;
 }
 
+#title-link {
+    color: black;
+    text-decoration: none;
+}
+
+#title-link:hover {
+    color: #4c4c4c;
+}
+
+#mobile-menu {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-bottom: 20px;
+    margin-top: -20px;
+    display: none;
+}
+
+#menu-button {
+    color: black;
+    font-family: Didot, serif;
+    font-size: 1.3em;
+    text-decoration: none;
+}
+
+#mobile-navs {
+    display: none;
+}
+
+#mobile-navs a {
+    color: black;
+    font-family: Didot, serif;
+    font-size: 1.3em;
+    text-decoration: none;
+}
+
 #banner {
     font-family: 'Jost';
     color: white;
@@ -65,7 +101,7 @@ html {
     display: flex;
     flex-direction: row;
     margin-top: 30px;
-    width: 70%;
+    width: 75%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -83,34 +119,19 @@ html {
     width: 34%;
 }
 
-#top-stories-container {
+.gray-container {
     background-color: rgba(196, 196, 196, 0.17);
     padding-top: 20px;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-#top-stories {
+.gray-container-title {
     color: #A3A3A3;
     font-family: 'Jost';
     font-weight: bold;
     font-size: 1.2em;
 }
-
-#opinion-container {
-    background-color: rgba(196, 196, 196, 0.17);
-    padding-top: 20px;
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-#opinion {
-    color: #A3A3A3;
-    font-family: 'Jost';
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
 
 .story-row {
     display: flex;
@@ -148,6 +169,7 @@ html {
 
 .article-left {
     width: 60%;
+    padding-right: 10px;
 }
 
 .article-title {
@@ -162,6 +184,7 @@ html {
 
 .article-right {
     width: 40%;
+    padding-left: 10px;
 }
 
 .article-right img {
@@ -272,7 +295,7 @@ html {
     font-size: 1.2em;
 }
 
-/** category smh */
+/* category smh */
 
 #category-content {
     margin-top: 30px;
@@ -332,4 +355,47 @@ html {
 
 .category-sub-article a:hover {
     text-decoration: underline;
+}
+
+/* about */
+
+.about b {
+    font-size: 1.3em;
+}
+
+.about a {
+    color: black;
+}
+
+@media only screen and (max-width: 1200px) {
+
+    #content {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #left-col {
+        width: 100%;
+    }
+
+    #right-col {
+        width: 100%;
+    }
+
+    #header ul {
+        display: none;
+    }
+
+    #mobile-menu {
+        display: block;
+    }
+
+    #content-article {
+        width: 95%;
+    }
+
+    .category-sub-article {
+        width: 100%;
+    }
+
 }

@@ -46,6 +46,33 @@ html {
     text-decoration: underline;
 }
 
+#mobile-menu {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding-bottom: 20px;
+    margin-top: -20px;
+    display: none;
+}
+
+#menu-button {
+    color: black;
+    font-family: Didot, serif;
+    font-size: 1.3em;
+    text-decoration: none;
+}
+
+#mobile-navs {
+    display: none;
+}
+
+#mobile-navs a {
+    color: black;
+    font-family: Didot, serif;
+    font-size: 1.3em;
+    text-decoration: none;
+}
+
 #banner {
     font-family: 'Jost';
     color: white;
@@ -262,4 +289,29 @@ html {
 
 #content-article p {
     font-size: 1.2em;
+}
+
+@media only screen and (max-width: 1200px) {
+
+    #content {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    #left-col {
+        width: 100%;
+    }
+
+    #right-col {
+        width: 100%;
+    }
+
+    #header ul {
+        display: none;
+    }
+
+    #mobile-menu {
+        display: block;
+    }
+
 }
