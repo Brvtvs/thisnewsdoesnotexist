@@ -6,10 +6,6 @@
     {% set num_articles_right = 5 %}
     <div id="left-col" class="content-col">
 
-        <!-- TODO use real publication times -->
-        {% set mocked_times = ['8 minutes ago', '19 minutes ago', '53 minutes ago', '1 hour ago', '3 hours ago',
-            '4 hours ago', '6 hours ago', '6 hours ago', '10 hours ago', '13 hours ago', '17 hours ago', '1 day ago'] %}
-
         {% for i in range(num_articles_left) %}
             {% if i < articles|length %}
                 {% set article = articles[i] %}
@@ -28,7 +24,7 @@
                                     reading...</b></a>
                             </div>
                             <div class="art-bot-right">
-                                <span>{{ mocked_times[i] }}</span>
+                                <span>{{ display_funcs.date_as_time_ago(article['published']) }}</span>
                             </div>
                         </div>
                     </div>
