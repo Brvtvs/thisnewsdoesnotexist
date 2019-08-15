@@ -166,11 +166,12 @@ def generate_articles_task():
 
 app = Flask(__name__)
 
+opinion_feeds = ('conservative-opinion', 'conservative-opinion-2', 'liberal-opinion', 'liberal-opinion-2')
+
 
 @app.route('/')
 def homepage():
     articles = storage.get_recent_articles(max_articles_returned, 'top-news')
-    opinion_feeds = ('conservative-opinion', 'conservative-opinion-2', 'liberal-opinion', 'liberal-opinion-2')
     opinions = []
     for feed in opinion_feeds:
         opinions = opinions + storage.get_recent_articles(round(max_articles_returned / len(opinion_feeds)), feed)
@@ -198,6 +199,17 @@ def view_category(category):
     cat_articles = storage.get_recent_articles(7, category)
 
     return render_template('category.html', category=category, cat_articles=cat_articles, display_funcs=display_funcs)
+
+
+@app.route('/opinion')
+def view_opinion():
+    opinions = []
+    for feed in opinion_feeds:
+        opinions = opinions + storage.get_recent_articles(round(max_articles_returned / len(opinion_feeds)), feed)
+    opinions.sort(key=lambda a: published_as_datetime(a), reverse=True)
+    opinions = opinions[:7]
+
+    return render_template('category.html', category='opinion', cat_articles=opinions, display_funcs=display_funcs)
 
 
 @app.route('/about')

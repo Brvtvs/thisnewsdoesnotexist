@@ -13,18 +13,21 @@
 </head>
 <body>
 <div id="wrapper">
+    {% set categories = [('Home', '/'), ('Opinion', '/opinion'), ('World', '/news/world'), ('Business', '/news/business'), ('Technology', '/news/technology'), ('Politics', '/news/politics'), ('Health', '/news/health'), ('Entertainment', '/news/entertainment'), ('Sports', '/news/sports')] %}
     <div id="header">
         <a id="title-link" href="/"><h1>THIS NEWS <span style="border-bottom: solid 3px #EC6060;">DOES NOT</span> EXIST
         </h1></a>
         <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/news/world">World</a></li>
-            <li><a href="/news/business">Business</a></li>
-            <li><a href="/news/technology">Technology</a></li>
-            <li><a href="/news/politics">Politics</a></li>
-            <li><a href="/news/health">Health</a></li>
-            <li><a href="/news/entertainment">Entertainment</a></li>
-            <li><a href="/news/sports">Sports</a></li>
+            {% for tup in categories %}
+                <li><a href="{{ tup[1] }}">
+                    {# Bolds the name of the category if this is the page for that category #}
+                    {% if tup[0].lower() == category %}
+                        <b>{{ tup[0] }}</b>
+                    {% else %}
+                        {{ tup[0] }}
+                    {% endif %}
+                </a></li>
+            {% endfor %}
         </ul>
     </div>
     <div id="mobile-menu">
@@ -43,14 +46,9 @@
         </a>
         <div id="mobile-navs">
             <br>
-            <a href="/">Home</a><br>
-            <a href="/news/world">World</a><br>
-            <a href="/news/business">Business</a><br>
-            <a href="/news/technology">Technology</a><br>
-            <a href="/news/politics">Politics</a><br>
-            <a href="/news/health">Health</a><br>
-            <a href="/news/entertainment">Entertainment</a><br>
-            <a href="/news/sports">Sports</a>
+            {% for tup in categories %}
+                <li><a href="{{ tup[1] }}">{{ tup[0] }}</a></li>
+            {% endfor %}
         </div>
     </div>
     <div id="banner">

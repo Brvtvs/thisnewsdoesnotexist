@@ -5,14 +5,11 @@
         </div>
         <div class="footer-col">
             <span class="footer-col-title">NEWS</span>
+            {% set categories = [('Opinion', '/opinion'), ('World', '/news/world'), ('Business', '/news/business'), ('Technology', '/news/technology'), ('Politics', '/news/politics'), ('Health', '/news/health'), ('Entertainment', '/news/entertainment'), ('Sports', '/news/sports')] %}
             <ul>
-                <li><a href="/news/world">World</a></li>
-                <li><a href="/news/business">Business</a></li>
-                <li><a href="/news/technology">Technology</a></li>
-                <li><a href="/news/politics">Politics</a></li>
-                <li><a href="/news/health">Health</a></li>
-                <li><a href="/news/entertainment">Entertainment</a></li>
-                <li><a href="/news/sports">Sports</a></li>
+                {% for tup in categories %}
+                    <li><a href="{{ tup[1] }}">{{ tup[0] }}</a></li>
+                {% endfor %}
             </ul>
         </div>
         <div class="footer-col">
