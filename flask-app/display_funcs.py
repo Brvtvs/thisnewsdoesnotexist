@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
 import nltk.data
+import pytz
+from tzlocal import get_localzone
 
 from text_cleanup import clean_body
 
@@ -44,16 +46,17 @@ def date_as_time_ago(time):
     """
 
     # makes up for the fact that we're taking predominantly from EU-timestamped articles
-    now = datetime.now() + timedelta(hours=5)
+    local_tz = get_localzone()
+    now = local_tz.localize(datetime.now())
+    source_tz = pytz.utc
 
     if type(time) is int:
-        diff = now - datetime.fromtimestamp(time)
+        diff = now - source_tz.localize(datetime.fromtimestamp(time))
     elif type(time) is str:
-        diff = now - datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+        diff = now - source_tz.localize(datetime.strptime(time, '%Y-%m-%d %H:%M:%S'))
     elif isinstance(time, datetime):
-        diff = now - time
-    elif not time:
-        diff = now - now
+        diff = now - source_tz.localize(time)
+
     second_diff = diff.seconds
     day_diff = diff.days
 
