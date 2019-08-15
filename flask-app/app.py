@@ -197,7 +197,7 @@ def view_category(category):
 
     cat_articles = storage.get_recent_articles(7, category)
 
-    return render_template('category.html', cat_articles=cat_articles, display_funcs=display_funcs)
+    return render_template('category.html', category=category, cat_articles=cat_articles, display_funcs=display_funcs)
 
 
 @app.route('/about')
