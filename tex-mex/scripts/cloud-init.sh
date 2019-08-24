@@ -10,3 +10,5 @@ usermod -a -G docker ec2-user
 addr=$(curl ipinfo.io/ip)
 # run our container
 docker run -d -it --name tex-mex -p 8000:8000 --mount type=bind,source=/home/ec2-user/mega,target=/tex-mex/grover/models/mega 244523355081.dkr.ecr.us-east-2.amazonaws.com/tex-mex-grover:latest
+# shutdown 
+echo "shutdown -h" | at now + 55 min
