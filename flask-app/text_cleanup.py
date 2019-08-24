@@ -92,6 +92,7 @@ strip_paragraphs_nocase = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "^Reuters$",
     "^Photo(:\s\w+)?$",
     "^Story continues below…?:?\.?$",
+    "^If you have an iPhone and want to comment, select the box with the upward arrow at the bottom of your screen; swipe left and choose “Request Desktop Site.” You may have to do this several times before the page reloads. Scroll down to the red horizontal bar that says “Show Comments.”$",
 ]))
 
 # todo block title-like paragraphs at the end of the article? Often may be non-existent links to other articles
@@ -188,6 +189,7 @@ filter_titles_with = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "paul ryan",
     "speaker ryan",
     "video",
+    "[watch]",
 ]))
 
 
