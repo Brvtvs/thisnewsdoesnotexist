@@ -90,9 +90,6 @@ def generate_articles():
     cached_articles = storage.get_articles_by_date(dates_seen)
     cached_titles = set(map(lambda a: a["original_title"], cached_articles))
 
-    print('Real titles (', len(real_articles_by_title), '):', real_articles_by_title.keys())
-    print()
-
     # only need to generate results for those we have not already generated results for
     uncached_articles = [a for a in real_articles_by_title.values() if a['title'] not in cached_titles]
 
