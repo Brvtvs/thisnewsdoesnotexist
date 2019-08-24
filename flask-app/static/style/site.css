@@ -3,7 +3,7 @@
 
 @font-face {
     font-family: JostBold;
-    src: url("../static/fonts/Jost-700-Bold.ttf");
+    src: url("../fonts/Jost-700-Bold.ttf");
 }
 
 html {
@@ -90,6 +90,7 @@ html {
     padding-top: 1px;
     padding-bottom: 1px;
     position: sticky;
+    position: -webkit-sticky; /* Safari */
     top: 0;
     font-size: 1.2em;
 }
