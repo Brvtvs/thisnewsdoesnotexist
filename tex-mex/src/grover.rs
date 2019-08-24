@@ -38,7 +38,7 @@ impl GroverConfig {
                           "lm/configs/meta.json",
                           "models/meta/model.ckpt",
                           "sample/meta.json",
-                          Model::Base)
+                          Model::Mega)
     }
 
     pub fn from_fs(path: &str) -> Option<GroverConfig> {
