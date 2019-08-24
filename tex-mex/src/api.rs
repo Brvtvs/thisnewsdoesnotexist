@@ -55,23 +55,12 @@ pub enum Model {
     Mega
 }
 
-impl Model {
-    pub fn to_str(&self) -> &str {
-        match self {
-            Model::Base => "base",
-            Model::Large => "large",
-            Model::Mega => "mega"
-        }
-    }
-}
-
 #[post("/", format = "application/json", data = "<req>")]
 pub fn gen(req: Json<GenerateRequest>) -> String {
     println!("received gen request {:?}", req);
     let req = req.0;
-    println!("gen request deserialized: {:?}", req);
 
-    let cfg = GroverConfig::from_fs("/tex-mex/GroverConfig.json")
+    let mut cfg = GroverConfig::from_fs("GroverConfig.json")
         .unwrap_or(GroverConfig::default());
     println!("using grover config {:?}", cfg);
 
@@ -87,4 +76,15 @@ pub fn gen(req: Json<GenerateRequest>) -> String {
         .expect("failed to serialize generated article response")
 }
 
+#[cfg(test)]
+mod tests {
+    use grover::GroverConfig;
+
+    #[test]
+    fn foo() {
+        let cfg = GroverConfig::from_fs("GroverConfig.json")
+            .unwrap_or(GroverConfig::default());
+        println!("using grover config {:?}", cfg);
+    }
+}
 

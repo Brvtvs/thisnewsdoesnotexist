@@ -51,4 +51,4 @@ RUN curl -L https://static.rust-lang.org/rustup.sh -O && \
 RUN ~/.cargo/bin/cargo build --release
 
 EXPOSE 8080
-ENTRYPOINT ["sh", "run.sh"]
+ENTRYPOINT ["sh", "scripts/run.sh"]
