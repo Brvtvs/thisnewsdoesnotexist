@@ -92,7 +92,12 @@ def generate_article_body(article_title, grover_parameters=None):
 
 def launch_ec2_instance():
     start = time.time()
-    result = subprocess.run(['sh', '../tex-mex/scripts/create-instance.sh'], stdout=subprocess.PIPE).stdout.decode(
-        'utf-8')
-    print("Result of running create-instance.sh after %i seconds:" % (time.time() - start))
-    print(result)
+    curdir = os.getcwd()
+    try:
+        os.chdir("../tex-mex/scripts")
+        result = subprocess.run(['sh', 'create-instance.sh'], stdout=subprocess.PIPE).stdout.decode(
+            'utf-8')
+        print("Result of running create-instance.sh after %i seconds:" % (time.time() - start))
+        print(result)
+    finally:
+        os.chdir(curdir)
