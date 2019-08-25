@@ -4,7 +4,6 @@ headlines.
 """
 
 import hashlib
-import json
 import re
 from datetime import datetime, date
 from multiprocessing import Process
@@ -15,6 +14,7 @@ import feedparser
 from flask import Flask, abort, request, render_template
 
 import config
+import contact_us
 import display_funcs
 import grover
 import storage
@@ -217,30 +217,20 @@ def view_about():
     return render_template('about.html')
 
 
-@app.route('/api/v1/articles')
-def get_articles():
-    # todo handle io errors because we have no actual concurrency control
+@app.route('/contact-us', methods=['GET', 'POST'])
+def contact_us_page():
+    if request.method == 'POST':
+        form = {
+            'first_name': request.form['first_name'],
+            'last_name': request.form['last_name'],
+            'email': request.form['email'],
+            'message': request.form['message'],
+        }
+        contact_us.on_submission(form)
+        return render_template('contact-us-response.html', display_funcs=display_funcs)
 
-    feed = request.args.get('feed')
-    quantity = request.args.get('quantity')
-    if not feed or not quantity:
-        abort(400, "Missing parameters.")
-    max_results = min(int(quantity), max_articles_returned)
-
-    if feed not in rss_feeds:
-        abort(400, 'Unrecognized feed.')
-
-    return json.dumps(
-        {'articles': storage.get_recent_articles(max_results, feed)},
-        sort_keys=True, default=str)
-
-
-@app.route('/api/v1/article/<date>/<id>')
-def get_article(date: str, id: str):
-    article = storage.get_article(date, id)
-    if not article:
-        abort(404, 'Article not found.')
-    return json.dumps(article, sort_keys=True, default=str)
+    else:
+        return render_template('contact-us-form.html', display_funcs=display_funcs)
 
 
 if __name__ == '__main__':

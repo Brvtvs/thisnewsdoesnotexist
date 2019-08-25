@@ -369,6 +369,13 @@ html {
     color: black;
 }
 
+/* contact us */
+#contact-page-title {
+    font-size: 1.5em;
+    color: black;
+    font-family: Didot, serif;
+}
+
 @media only screen and (max-width: 1200px) {
 
     #content {
