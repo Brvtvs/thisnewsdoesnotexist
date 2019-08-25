@@ -1,0 +1,30 @@
+{% with head_title="Contact us" %}
+    {% include 'header.html' %}
+{% endwith %}
+<div id="content-article" class="contact-us">
+    <div id="contact-page-title">
+        <span><b>Contact us</b></span>
+    </div>
+    <div>
+        <p>Fill out the form below to get in touch. We welcome your feedback, critique, and suggestions.</p>
+        <br>
+        <form action="/contact-us" method="POST">
+            First name:<br>
+            <input type="text" name="first_name" required>
+            <br><br>
+            Last name:<br>
+            <input type="text" name="last_name" required>
+            <br><br>
+            Email address:<br>
+            <input type="text" name="email" required>
+            <br><br>
+            Message:<br>
+            <textarea name="message" rows="6" cols="60" required></textarea>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+<br><br>
+{% include 'footer.html' %}
