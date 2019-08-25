@@ -29,7 +29,9 @@
                         </div>
                     </div>
                     <div class="article-right">
-                        <img src="{{ article['matched_image_link'] }}"/>
+                        <a href="{{ article_link }}">
+                            <img src="{{ article['matched_image_link'] }}"/>
+                        </a>
                     </div>
                 </div>
                 {% if i < num_articles_left - 1 %}
