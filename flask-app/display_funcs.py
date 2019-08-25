@@ -8,7 +8,9 @@ from text_cleanup import clean_body
 
 nltk.download('punkt')
 
-max_preview_char_length = 550
+max_preview_char_length = 450
+min_preview_char_length = 300
+max_preview_lines = 4
 
 
 def get_clean_article_text(article):
@@ -16,26 +18,28 @@ def get_clean_article_text(article):
 
 
 def get_article_preview_text(article):
-    # By default, uses first two lines of article body, separated by <br><br>
+    preview = ''
+
     lines = get_clean_article_text(article).splitlines()
-    preview = '<br><br>'.join(lines[:2])
+    for line in lines[:max_preview_lines]:
+        # adds lines until reaching max length
+        if len(preview) + len(line) < max_preview_char_length:
+            preview += '<br><br>' + line
 
-    # If first line is too long on its own, truncates it
-    if len(lines[0]) > max_preview_char_length:
-        sentences = nltk.tokenize.sent_tokenize(lines[0])
-        preview = ''
-        for sentence in sentences:
-            if len(preview) != 0 and len(preview) + len(sentence) > max_preview_char_length:
-                break
-            preview += ' ' + sentence
+        # if next line surpasses max length, but we are far below what we want, truncates the last line to get closer to target length.
+        elif len(preview) < min_preview_char_length:
+            last_line_sentences = nltk.tokenize.sent_tokenize(line)
+            preview += '<br><br>'
+            for sentence in last_line_sentences:
+                if len(preview) != 0 and len(preview) + len(sentence) > max_preview_char_length:
+                    break
+                preview += ' ' + sentence
+            break
 
-    # If first two lines will be too long, uses just first if it is reasonably long
-    elif len(preview) > max_preview_char_length and len(lines[0]) > 100:
-        preview = lines[0]
+        else:
+            break
 
-    # todo deal with short first line and very long second one
-
-    return preview.strip()
+    return preview.strip('<br><br>').strip()
 
 
 def date_as_time_ago(time):
