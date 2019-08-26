@@ -30,10 +30,10 @@ headers = {"Accept": "application/json, text/plain, */*",
 
 
 def get_grover_url():
-    file = "../tex-mex/scripts/running-instance-ip.txt"
+    file = "../tex-mex/scripts/running_instance_ip.txt"
     if not os.path.exists(file):
         raise Exception(
-            "No IP address found in tex-mex/scripts/running-instance-ip.txt. Has an AWS instance been spun up yet?")
+            "No IP address found in tex-mex/scripts/running_instance_ip.txt. Has an AWS instance been spun up yet?")
     with open(file, 'rt') as ip_file:
         ip = ip_file.readline()
         return grover_url_base % ip
