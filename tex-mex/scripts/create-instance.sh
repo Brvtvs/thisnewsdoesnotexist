@@ -6,4 +6,4 @@ sleep 30 && \
 ip=$(aws ec2 describe-instances --filter Name=instance-state-name,Values=running --query 'Reservations[*].Instances[*].PublicIpAddress' | sed 's/[][]//g' | tr -d ' "\t\n\r\f') && \
 # send ip to stdoutt & write to file
 echo "$ip" && \
-echo "$ip" >> running_instance_ip.txt
+echo "$ip" > running_instance_ip.txt
