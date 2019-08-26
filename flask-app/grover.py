@@ -44,7 +44,7 @@ def generate_article_title(prompt, grover_parameters=None):
         grover_parameters = {}
 
     request_body = request_json()
-    request_body["meta"]["date"] = date.today().strftime("%B %d, %Y")
+    request_body["meta"]["publish_date"] = date.today().strftime("%B %d, %Y")
 
     for k, v in grover_parameters.items():
         request_body["meta"][k] = v
@@ -68,7 +68,7 @@ def generate_article_body(article_title, grover_parameters=None):
         grover_parameters = {}
 
     request_body = request_json()
-    request_body["meta"]["date"] = date.today().strftime("%B %d, %Y")
+    request_body["meta"]["publish_date"] = date.today().strftime("%B %d, %Y")
 
     for k, v in grover_parameters.items():
         request_body["meta"][k] = v
