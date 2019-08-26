@@ -113,6 +113,8 @@ def generate_articles():
                 start = time.time()
                 generated_title = grover.generate_article_title(article['title'], grover_params)
                 print('It took %i seconds for grover to generate a title.' % (time.time() - start))
+                # pauses between generations in order to try to give the server a chance to release memory
+                sleep(10)
                 if not text_cleanup.is_title_irreparable(generated_title):
                     title_good = True
                     break
@@ -125,6 +127,8 @@ def generate_articles():
                 start = time.time()
                 generated_body = grover.generate_article_body(generated_title, grover_params)
                 print('It took %i seconds for grover to generate a body.' % (time.time() - start))
+                # pauses between generations in order to try to give the server a chance to release memory
+                sleep(10)
                 if not text_cleanup.is_body_irreparable(generated_body):
                     body_good = True
                     break
