@@ -4,7 +4,9 @@ headlines.
 """
 
 import hashlib
+import os
 import re
+import time
 from datetime import datetime, date
 from multiprocessing import Process
 from time import mktime
@@ -27,7 +29,7 @@ from storage import published_as_datetime
 gen_1_for_each_x_articles = 4
 
 # amount of time to wait in between scraping the rss feed(s)
-seconds_between_generation = 1200
+seconds_between_generation = 120
 
 rss_feeds = {
     'top-news': 'http://feeds.reuters.com/reuters/topNews',
@@ -88,9 +90,6 @@ def generate_articles():
     cached_articles = storage.get_articles_by_date(dates_seen)
     cached_titles = set(map(lambda a: a["original_title"], cached_articles))
 
-    print('Real titles (', len(real_articles_by_title), '):', real_articles_by_title.keys())
-    print()
-
     # only need to generate results for those we have not already generated results for
     uncached_articles = [a for a in real_articles_by_title.values() if a['title'] not in cached_titles]
 
@@ -108,20 +107,24 @@ def generate_articles():
                     break
 
             # todo is there a better way to seed the generator than this?
-            generated_title = grover.generate_article_title(article['title'], grover_params)
             # runs generated body through sanity check
             title_good = False
             for i in range(3):
+                start = time.time()
+                generated_title = grover.generate_article_title(article['title'], grover_params)
+                print('It took %i seconds for grover to generate a title.' % (time.time() - start))
                 if not text_cleanup.is_title_irreparable(generated_title):
                     title_good = True
                     break
             if not title_good:
                 raise Exception("Failed to generate good title after 3 tries for original title: %s" % article['title'])
 
-            generated_body = grover.generate_article_body(generated_title, grover_params)
             # runs generated body through sanity check
             body_good = False
             for i in range(3):
+                start = time.time()
+                generated_body = grover.generate_article_body(generated_title, grover_params)
+                print('It took %i seconds for grover to generate a body.' % (time.time() - start))
                 if not text_cleanup.is_body_irreparable(generated_body):
                     body_good = True
                     break
@@ -159,9 +162,40 @@ def generate_articles_task():
     while True:
         try:
             generate_articles()
-        except Exception:
+        except Exception as e:
             print('Encountered an error generating articles. Will try again later...')
+            print(e)
         sleep(seconds_between_generation)
+
+
+def launch_ec2_task():
+    file = 'ec2_launch_timestamp.txt'
+
+    while True:
+        try:
+            launch_instance = False
+            # if no timestamp of last launch, time to launch
+            if not os.path.exists(file):
+                print("Launching grover EC2 instance because no timestamp found for the last time one was launched.")
+                launch_instance = True
+            # else if the last launch timestamp is far enough in the past
+            else:
+                with open(file, 'rt') as timestamp_file:
+                    last_launched = float(timestamp_file.readline())
+                    if time.time() - last_launched >= config.launch_ec2_instance_every_X_hours * 60 * 60:
+                        print("Launching grover EC2 instance because the last was launched %i seconds ago." % (
+                                time.time() - last_launched))
+                        launch_instance = True
+            if launch_instance:
+                grover.launch_ec2_instance()
+                with open(file, 'wt') as timestamp_file:
+                    timestamp_file.write(str(time.time()))
+        except Exception as e:
+            print('Encountered an error launching an EC2 instance for grover. Will try again later...')
+            print(e)
+
+        # checks every 5 minutes
+        sleep(300)
 
 
 app = Flask(__name__)
@@ -235,6 +269,9 @@ def contact_us_page():
 
 if __name__ == '__main__':
     if config.generate_new_articles:
-        background_process = Process(target=generate_articles_task)
-        background_process.start()
+        generator_process = Process(target=generate_articles_task)
+        generator_process.start()
+    if config.launch_ec2_instances and config.launch_ec2_instance_every_X_hours > 0:
+        ec2_process = Process(target=launch_ec2_task)
+        ec2_process.start()
     app.run(host='0.0.0.0', port=config.port)
