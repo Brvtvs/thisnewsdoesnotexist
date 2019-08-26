@@ -19,9 +19,7 @@ RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-4.
      ~/miniconda.sh -b -p /opt/conda && \
      rm ~/miniconda.sh && \
      /opt/conda/bin/conda install -y python=3.6 tqdm numpy pyyaml scipy ipython mkl mkl-include cython typing h5py pandas && \
-     /opt/conda/bin/conda clean -ya && /opt/conda/bin/pip install tensorflow-gpu==1.13.1 && \
-     # fake news: install base tensorflow, this step is not done in default grover file for some reason
-     /opt/conda/bin/pip install tensorflow 
+     /opt/conda/bin/conda clean -ya && /opt/conda/bin/pip install tensorflow-gpu==1.13.1
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
