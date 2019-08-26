@@ -35,7 +35,7 @@ def get_grover_url():
         raise Exception(
             "No IP address found in tex-mex/scripts/running_instance_ip.txt. Has an AWS instance been spun up yet?")
     with open(file, 'rt') as ip_file:
-        ip = ip_file.readline()
+        ip = ip_file.readline().strip()
         return grover_url_base % ip
 
 
