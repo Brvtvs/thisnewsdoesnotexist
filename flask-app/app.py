@@ -118,6 +118,8 @@ def generate_articles():
                 if not text_cleanup.is_title_irreparable(generated_title):
                     title_good = True
                     break
+                else:
+                    print('Regenerating title because it was irreparable: ' + generated_title)
             if not title_good:
                 raise Exception("Failed to generate good title after 3 tries for original title: %s" % article['title'])
 
@@ -132,6 +134,8 @@ def generate_articles():
                 if not text_cleanup.is_body_irreparable(generated_body):
                     body_good = True
                     break
+                else:
+                    print('Regenerating body because it was irreparable: ' + generated_body)
             if not body_good:
                 raise Exception("Failed to generate a good body after 3 tries for title: %s" % generated_title)
 
