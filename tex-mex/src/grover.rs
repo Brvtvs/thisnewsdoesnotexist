@@ -91,7 +91,11 @@ impl GroverConfig {
                 .expect("failed to get status code for grover process");
             println!("got status code {}", code);
 
-            Some(self.get_generated_article(output.as_str()))
+            if code != 0 {
+                None
+            } else {
+                Some(self.get_generated_article(output.as_str()))
+            }
         } else {
             panic!("failed to start grover process");
         }
