@@ -10,4 +10,4 @@ usermod -a -G docker ec2-user
 # run our container with nvidia-docker for gpu support
 nvidia-docker run -d -it --name tex-mex --runtime=nvidia -p 8000:8000 --mount type=bind,source=/home/ec2-user/mega,target=/tex-mex/grover/models/mega 244523355081.dkr.ecr.us-east-2.amazonaws.com/tex-mex-grover:latest
 # self destruct
-echo "sudo halt' | at now + 55 minutes
+echo "sudo halt" | at now + 55 minutes
