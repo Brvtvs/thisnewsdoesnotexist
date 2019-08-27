@@ -191,7 +191,8 @@ filter_titles_with = list(map(lambda s: re.compile(s, re.IGNORECASE), [
     "paul ryan",
     "speaker ryan",
     "video",
-    "[watch]",
+    "\[watch\]",
+    "\[video\]",
 ]))
 
 
